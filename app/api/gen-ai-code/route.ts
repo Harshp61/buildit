@@ -192,15 +192,12 @@ export async function POST(request: NextRequest) {
         const contents = buildContents(messages, fileData);
 
         const geminiStream = await ai.models.generateContentStream({
-          model: "gemini-3.7-flash",
+          model: "gemini-2.5-flash",
           contents,
           config: {
             systemInstruction: SYSTEM_PROMPT,
             temperature: 0.7,
             responseMimeType: "application/json",
-            thinkingConfig: {
-              includeThoughts: true,
-            },
           },
         });
 
