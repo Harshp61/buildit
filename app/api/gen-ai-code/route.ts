@@ -6,7 +6,8 @@ import { CREDIT_COST_PER_GENERATION } from "@/lib/constants";
 import type { Message, FileData } from "@/types/workspace";
 import { aj } from "@/lib/arcjet";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const ai = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 
 // ─── SSE helper ───────────────────────────────────────────────────────────────
 
@@ -123,6 +124,14 @@ export async function POST(request: NextRequest) {
   const { userId: clerkId } = await auth();
   if (!clerkId) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!geminiApiKey || !ai) {
+    console.error("[gen-ai-code] Missing GEMINI_API_KEY");
+    return Response.json(
+      { message: "AI provider is not configured on this deployment." },
+      { status: 500 }
+    );
   }
 
   const body = await request.json();
